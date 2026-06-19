@@ -5,7 +5,6 @@
     ../modules/desktop.nix
     ../modules/install-script.nix
     ../modules/home-q.nix
-    ../modules/grow-root.nix
   ];
 
   networking.hostName = "nixos-live";
