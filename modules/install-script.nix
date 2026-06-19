@@ -23,16 +23,20 @@ let
       [ -z "$BOOT_DEV" ] && BOOT_DEV="$ROOT_SRC"
       BOOT_DEV_REAL="$(realpath "$BOOT_DEV" 2>/dev/null || echo "$BOOT_DEV")"
 
+      shopt -s nullglob
+
       CANDIDATES=()
       while IFS= read -r NAME; do
         DEV="/dev/$NAME"
         REAL="$(realpath "$DEV" 2>/dev/null || echo "$DEV")"
         [ "$REAL" = "$BOOT_DEV_REAL" ] && continue
         BY_ID=""
-        while IFS= read -r id; do
-          target="$(realpath "/dev/disk/by-id/$id" 2>/dev/null || true)"
+        for id_path in /dev/disk/by-id/*; do
+          id="''${id_path##*/}"
+          [[ "$id" =~ -part[0-9]+$ ]] && continue
+          target="$(realpath "$id_path" 2>/dev/null || true)"
           if [ "$target" = "$REAL" ]; then BY_ID="$id"; break; fi
-        done < <(ls /dev/disk/by-id/ | grep -v -- '-part[0-9]*$')
+        done
         [ -z "$BY_ID" ] && continue
         SIZE="$(lsblk -dno SIZE "$DEV")"
         MODEL="$(lsblk -dno MODEL "$DEV" | sed 's/  */ /g')"
