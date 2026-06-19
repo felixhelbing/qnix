@@ -54,6 +54,16 @@
           # Reduce writes on USB flash; nixos-generators provides device + fsType.
           fileSystems."/".options = [ "noatime" ];
           fileSystems."/boot".options = [ "noatime" ];
+
+          # Flake source for the installer; lib.fileset needs a path literal.
+          environment.etc."live".source = nixpkgs.lib.fileset.toSource {
+            root = ./.;
+            fileset = nixpkgs.lib.fileset.unions ([
+              ./flake.nix
+              ./hosts
+              ./modules
+            ] ++ nixpkgs.lib.optional (builtins.pathExists ./flake.lock) ./flake.lock);
+          };
         }
       ];
       format = "raw-efi";

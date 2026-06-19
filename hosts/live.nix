@@ -29,15 +29,6 @@
     home-manager.flake = inputs.home-manager;
   };
 
-  environment.etc."live".source = lib.fileset.toSource {
-    root = self;
-    fileset = lib.fileset.unions ([
-      (self + /flake.nix)
-      (self + /hosts)
-      (self + /modules)
-    ] ++ lib.optional (builtins.pathExists (self + /flake.lock)) (self + /flake.lock));
-  };
-
   environment.systemPackages = with pkgs; [
     pciutils usbutils
   ];
