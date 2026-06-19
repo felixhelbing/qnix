@@ -34,26 +34,28 @@
     ];
 
     liveModules = baseModules ++ [ ./hosts/live.nix ];
-    targetDesktopModules = baseModules ++ [
+    desktopModules = baseModules ++ [
       disko.nixosModules.disko
       ./hosts/target-desktop.nix
     ];
-
-    mkSystem = modules: nixpkgs.lib.nixosSystem {
-      inherit system modules;
-      specialArgs = commonArgs;
-    };
   in
   {
-    nixosConfigurations = {
-      live = mkSystem liveModules;
-      target-desktop = mkSystem targetDesktopModules;
+    nixosConfigurations.target-desktop = nixpkgs.lib.nixosSystem {
+      inherit system;
+      specialArgs = commonArgs;
+      modules = desktopModules;
     };
 
     packages.${system}.usbImage = nixos-generators.nixosGenerate {
       inherit system;
       specialArgs = commonArgs;
-      modules = liveModules;
+      modules = liveModules ++ [
+        {
+          # Reduce writes on USB flash; nixos-generators provides device + fsType.
+          fileSystems."/".options = [ "noatime" ];
+          fileSystems."/boot".options = [ "noatime" ];
+        }
+      ];
       format = "raw-efi";
     };
 

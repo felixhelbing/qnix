@@ -14,10 +14,6 @@
 
   documentation.enable = false;
 
-  # Reduce writes on USB flash
-  fileSystems."/".options = [ "noatime" ];
-  fileSystems."/boot".options = [ "noatime" ];
-
   system.extraDependencies = [
     self.nixosConfigurations.target-desktop.config.system.build.toplevel
     self.nixosConfigurations.target-desktop.config.system.build.diskoScript
