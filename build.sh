@@ -5,9 +5,10 @@ cd "$(dirname "$(readlink -f "$0")")"
 
 nix build .#usbImage -o result --print-build-logs
 
-IMG="$(find -L result -maxdepth 2 -name '*.img' -print -quit)"
+IMG="$(find -L result -maxdepth 2 -type f \( -name '*.img' -o -name '*.raw' \) -print -quit)"
 if [ -z "$IMG" ]; then
-  echo "ERROR: no .img produced under result/" >&2
+  echo "ERROR: no image produced under result/" >&2
+  find -L result -maxdepth 2 -type f >&2
   exit 1
 fi
 

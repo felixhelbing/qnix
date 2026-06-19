@@ -10,6 +10,10 @@ in
   boot.loader.efi.canTouchEfiVariables = true;
   boot.tmp.cleanOnBoot = true;
 
+  # systemd-initrd so the LUKS prompt has a working keymap
+  boot.initrd.systemd.enable = true;
+  boot.kernelParams = [ "rd.vconsole.keymap=${keyMap}" ];
+
   time.timeZone = timeZone;
   i18n.defaultLocale = locale;
   console.keyMap = keyMap;

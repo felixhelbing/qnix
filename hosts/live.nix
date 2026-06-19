@@ -5,6 +5,7 @@
     ../modules/desktop.nix
     ../modules/install-script.nix
     ../modules/home-q.nix
+    ../modules/grow-root.nix
   ];
 
   networking.hostName = "nixos-live";
@@ -27,6 +28,15 @@
     nixpkgs.flake = inputs.nixpkgs;
     disko.flake = inputs.disko;
     home-manager.flake = inputs.home-manager;
+  };
+
+  environment.etc."live".source = lib.fileset.toSource {
+    root = ../.;
+    fileset = lib.fileset.unions ([
+      ../flake.nix
+      ../hosts
+      ../modules
+    ] ++ lib.optional (builtins.pathExists ../flake.lock) ../flake.lock);
   };
 
   environment.systemPackages = with pkgs; [

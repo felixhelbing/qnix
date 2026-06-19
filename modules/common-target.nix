@@ -8,9 +8,6 @@
 
   networking.hostName = lib.mkDefault "nixos";
 
-  # systemd in initrd so the LUKS prompt respects the keymap
-  boot.initrd.systemd.enable = true;
-
   services.openssh = {
     enable = true;
     settings = {
