@@ -44,7 +44,7 @@ jobs:
       - name: Stage with timestamp
         run: |
           mkdir staged
-          SRC="$(find -L result -maxdepth 2 -type f \( -name '*.raw' -o -name '*.img' -o -name '*.iso' \) | head -1)"
+          SRC="$(find -L result -maxdepth 3 -type f \( -name '*.raw' -o -name '*.img' -o -name '*.iso' \) | head -1)"
           EXT="${SRC##*.}"
           cp -L "$SRC" "staged/nixos-${{ matrix.arch }}-${{ steps.ts.outputs.ts }}.$EXT"
 
