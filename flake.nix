@@ -1,7 +1,11 @@
 {
-  description = "NixOS Live Image";
+  description = "qNixOs — Linux + macOS";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -15,7 +19,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
-  outputs = { self, nixpkgs, disko, home-manager, nixos-generators, ... }@inputs:
+  outputs = { self, nixpkgs, nix-darwin, disko, home-manager, nixos-generators, ... }@inputs:
   let
     nixosRelease = "25.05";
     keyMap     = "us";
@@ -23,45 +27,51 @@
     locale     = "en_US.UTF-8";
     commonArgs = { inherit inputs self nixosRelease keyMap timeZone locale; };
 
-    hostModules = [
-      home-manager.nixosModules.home-manager
-      {
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
-        home-manager.extraSpecialArgs = commonArgs;
-      }
-    ];
+    hmNixosModule = home-manager.nixosModules.home-manager;
+    hmDarwinModule = home-manager.darwinModules.home-manager;
+    hmConfig = {
+      home-manager.useGlobalPkgs = true;
+      home-manager.useUserPackages = true;
+      home-manager.extraSpecialArgs = commonArgs;
+    };
 
-    # Target-Install always uses disko (LUKS on installed disk regardless of arch)
-    desktopModules = hostModules ++ [
+    nixosBaseModules = [ hmNixosModule hmConfig ];
+
+    desktopModules = nixosBaseModules ++ [
       disko.nixosModules.disko
       ./hosts/target-desktop.nix
     ];
 
-    # Live for x86: disko-based, LUKS on stick (KVM available on x86 runner)
-    liveModulesX86 = hostModules ++ [
+    liveModulesX86 = nixosBaseModules ++ [
       disko.nixosModules.disko
-      ./modules/disko-live.nix
+      ./modules/nixos/disko-live.nix
       ./hosts/live.nix
     ];
 
-    # Live for aarch64: nixos-generators raw-efi, no LUKS on stick
-    # (ARM runner has no KVM, can't do disko image build)
-    liveModulesAarch64 = hostModules ++ [
+    liveModulesAarch64 = nixosBaseModules ++ [
       ./hosts/live.nix
     ];
 
-    mkSystem = system: modules: nixpkgs.lib.nixosSystem {
+    mkNixos = system: modules: nixpkgs.lib.nixosSystem {
       inherit system modules;
       specialArgs = commonArgs;
     };
   in
   {
     nixosConfigurations = {
-      live-x86_64           = mkSystem "x86_64-linux"  liveModulesX86;
-      live-aarch64          = mkSystem "aarch64-linux" liveModulesAarch64;
-      target-desktop-x86_64 = mkSystem "x86_64-linux"  desktopModules;
-      target-desktop-aarch64 = mkSystem "aarch64-linux" desktopModules;
+      live-x86_64            = mkNixos "x86_64-linux"  liveModulesX86;
+      target-desktop-x86_64  = mkNixos "x86_64-linux"  desktopModules;
+      target-desktop-aarch64 = mkNixos "aarch64-linux" desktopModules;
+    };
+
+    darwinConfigurations.q = nix-darwin.lib.darwinSystem {
+      system = "aarch64-darwin";
+      specialArgs = commonArgs;
+      modules = [
+        hmDarwinModule
+        hmConfig
+        ./hosts/mac.nix
+      ];
     };
 
     packages.x86_64-linux.usbImage =
@@ -74,7 +84,8 @@
       format = "raw-efi";
     };
 
-    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
-    formatter.aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style;
+    formatter.x86_64-linux   = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
+    formatter.aarch64-linux  = nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style;
+    formatter.aarch64-darwin = nixpkgs.legacyPackages.aarch64-darwin.nixfmt-rfc-style;
   };
 }

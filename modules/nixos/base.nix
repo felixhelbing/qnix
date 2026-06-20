@@ -30,7 +30,7 @@ in
 
   security.sudo.wheelNeedsPassword = false;
 
-  environment.systemPackages = with pkgs; [ neovim git htop ];
+  environment.systemPackages = with pkgs; [ htop ];
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

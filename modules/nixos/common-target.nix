@@ -1,12 +1,9 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ./base.nix
     ./disko-target.nix
-    ./home-q.nix
   ];
-
-  networking.hostName = lib.mkDefault "nixos";
 
   services.openssh = {
     enable = true;

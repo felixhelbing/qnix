@@ -5,13 +5,14 @@ let
 in
 {
   imports = [
-    ../modules/base.nix
-    ../modules/desktop.nix
-    ../modules/install-script.nix
-    ../modules/home-q.nix
+    ../modules/nixos/base.nix
+    ../modules/nixos/desktop.nix
+    ../modules/nixos/install-script.nix
+    ../modules/home/common.nix
+    ../modules/home/linux.nix
   ];
 
-  networking.hostName = "nixos-live";
+  networking.hostName = "q";
 
   # Don't touch the host's EFI boot order from the stick
   boot.loader.efi.canTouchEfiVariables = lib.mkForce false;

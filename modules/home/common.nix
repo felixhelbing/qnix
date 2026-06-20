@@ -10,11 +10,16 @@
         gs = "git status";
         gd = "git diff";
       };
-      profileExtra = ''
-        if [ -z "''${WAYLAND_DISPLAY:-}" ] && [ "$(tty)" = "/dev/tty1" ]; then
-          exec sway
-        fi
-      '';
+    };
+
+    programs.git = {
+      enable = true;
+      # user.name / user.email to be filled in
+    };
+
+    programs.neovim = {
+      enable = true;
+      defaultEditor = true;
     };
 
     xdg.configFile."ghostty/config".text = ''

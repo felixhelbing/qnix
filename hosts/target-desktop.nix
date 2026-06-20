@@ -1,9 +1,11 @@
 { ... }:
 {
   imports = [
-    ../modules/common-target.nix
-    ../modules/desktop.nix
+    ../modules/nixos/common-target.nix
+    ../modules/nixos/desktop.nix
+    ../modules/home/common.nix
+    ../modules/home/linux.nix
   ];
 
-  networking.hostName = "nixos-desktop";
+  networking.hostName = "q";
 }
