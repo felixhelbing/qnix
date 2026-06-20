@@ -12,10 +12,7 @@
       };
     };
 
-    programs.git = {
-      enable = true;
-      # user.name / user.email to be filled in
-    };
+    programs.git.enable = true;
 
     programs.neovim = {
       enable = true;

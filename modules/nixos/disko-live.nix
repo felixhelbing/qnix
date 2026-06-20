@@ -24,8 +24,6 @@
           content = {
             type = "luks";
             name = "cryptlive";
-            # writeText puts "foo" in the build's store; used only at format time,
-            # not baked into the runtime initrd.
             passwordFile = "${pkgs.writeText "luks-foo" "foo"}";
             settings.allowDiscards = true;
             content = {

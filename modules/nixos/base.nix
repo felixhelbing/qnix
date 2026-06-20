@@ -27,7 +27,8 @@ in
     extraGroups = [ "wheel" "networkmanager" ];
     initialHashedPassword = initialPasswordHash;
   };
-  users.users.root.initialHashedPassword = initialPasswordHash;
+  users.users.root.hashedPassword = initialPasswordHash;
+  boot.initrd.systemd.emergencyAccess = true;
 
   security.sudo.wheelNeedsPassword = false;
 

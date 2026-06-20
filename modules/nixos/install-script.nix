@@ -1,6 +1,7 @@
 { pkgs, ... }:
 let
   arch = pkgs.stdenv.hostPlatform.parsed.cpu.name;
+  offlineFlag = if arch == "x86_64" then "--option substitute false" else "";
   installScript = pkgs.writeShellApplication {
     name = "install-to-disk";
     runtimeInputs = with pkgs; [
@@ -73,7 +74,7 @@ let
         --disk main "$DISK" \
         --no-root-passwd \
         --write-efi-boot-entries \
-        --option substitute false
+        ${offlineFlag}
 
       gum confirm --default=no "Reboot?" && systemctl reboot
     '';

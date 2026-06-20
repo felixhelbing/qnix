@@ -48,8 +48,8 @@
       ./hosts/live.nix
     ];
 
-    liveModulesAarch64 = nixosBaseModules ++ [
-      ./hosts/live.nix
+    installerModulesAarch64 = nixosBaseModules ++ [
+      ./hosts/installer.nix
     ];
 
     mkNixos = system: modules: nixpkgs.lib.nixosSystem {
@@ -80,8 +80,8 @@
     packages.aarch64-linux.usbImage = nixos-generators.nixosGenerate {
       system = "aarch64-linux";
       specialArgs = commonArgs;
-      modules = liveModulesAarch64;
-      format = "raw-efi";
+      modules = installerModulesAarch64;
+      format = "iso";
     };
 
     formatter.x86_64-linux   = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
