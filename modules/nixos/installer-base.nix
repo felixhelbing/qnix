@@ -29,8 +29,8 @@
 
   environment.systemPackages = with pkgs; [ pciutils usbutils ];
 
-  systemd.sleep.extraConfig = ''
-    AllowSuspend=no
-    AllowHibernation=no
-  '';
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = false;
+    AllowHibernation = false;
+  };
 }
