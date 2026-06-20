@@ -20,7 +20,7 @@
     pulse.enable = true;
   };
 
-  services.thermald.enable = lib.mkDefault true;
+  services.thermald.enable = lib.mkDefault pkgs.stdenv.hostPlatform.isx86_64;
   services.tlp.enable = lib.mkDefault true;
 
   environment.systemPackages = with pkgs; [

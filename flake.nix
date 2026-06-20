@@ -13,7 +13,6 @@
   };
   outputs = { self, nixpkgs, disko, home-manager, ... }@inputs:
   let
-    system = "x86_64-linux";
     nixosRelease = "25.05";
     keyMap     = "us";
     timeZone   = "Europe/Berlin";
@@ -37,24 +36,31 @@
     desktopModules = baseModules ++ [
       ./hosts/target-desktop.nix
     ];
-  in
-  {
-    nixosConfigurations = {
-      live = nixpkgs.lib.nixosSystem {
+
+    mkPair = system: shortArch: {
+      "live-${shortArch}" = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = commonArgs;
         modules = liveModules;
       };
-      target-desktop = nixpkgs.lib.nixosSystem {
+      "target-desktop-${shortArch}" = nixpkgs.lib.nixosSystem {
         inherit system;
         specialArgs = commonArgs;
         modules = desktopModules;
       };
     };
+  in
+  {
+    nixosConfigurations =
+      mkPair "x86_64-linux" "x86_64"
+      // mkPair "aarch64-linux" "aarch64";
 
-    packages.${system}.usbImage =
-      self.nixosConfigurations.live.config.system.build.diskoImages;
+    packages.x86_64-linux.usbImage =
+      self.nixosConfigurations.live-x86_64.config.system.build.diskoImages;
+    packages.aarch64-linux.usbImage =
+      self.nixosConfigurations.live-aarch64.config.system.build.diskoImages;
 
-    formatter.${system} = nixpkgs.legacyPackages.${system}.nixfmt-rfc-style;
+    formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt-rfc-style;
+    formatter.aarch64-linux = nixpkgs.legacyPackages.aarch64-linux.nixfmt-rfc-style;
   };
 }

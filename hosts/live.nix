@@ -1,4 +1,8 @@
 { pkgs, lib, inputs, self, ... }:
+let
+  arch = pkgs.stdenv.hostPlatform.parsed.cpu.name;
+  target = self.nixosConfigurations."target-desktop-${arch}";
+in
 {
   imports = [
     ../modules/base.nix
@@ -15,8 +19,8 @@
   documentation.enable = false;
 
   system.extraDependencies = [
-    self.nixosConfigurations.target-desktop.config.system.build.toplevel
-    self.nixosConfigurations.target-desktop.config.system.build.diskoScript
+    target.config.system.build.toplevel
+    target.config.system.build.diskoScript
     inputs.nixpkgs
     inputs.disko
     inputs.home-manager

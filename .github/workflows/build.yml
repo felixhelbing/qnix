@@ -4,7 +4,15 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
@@ -13,14 +21,33 @@ jobs:
           extra-conf: |
             experimental-features = nix-command flakes
 
+      - uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('flake.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-${{ runner.arch }}-
+          gc-max-store-size-linux: 7000000000
+          purge: true
+          purge-prefixes: nix-${{ runner.os }}-${{ runner.arch }}-
+          purge-created: 0
+          purge-primary-key: never
+
+      - name: Set timestamp
+        id: ts
+        run: echo "ts=$(date -u +%Y%m%d-%H%M)" >> "$GITHUB_OUTPUT"
+
       - name: Check flake
         run: nix flake check --no-build
 
       - name: Build USB image
         run: ./build.sh
 
+      - name: Stage with timestamp
+        run: |
+          mkdir staged
+          cp -L result/*.raw "staged/nixos-live-${{ matrix.arch }}-${{ steps.ts.outputs.ts }}.raw"
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: usb-image
-          path: result/
+          name: usb-image-${{ matrix.arch }}-${{ steps.ts.outputs.ts }}
+          path: staged/
           retention-days: 7

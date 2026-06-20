@@ -1,5 +1,6 @@
 { pkgs, ... }:
 let
+  arch = pkgs.stdenv.hostPlatform.parsed.cpu.name;
   installScript = pkgs.writeShellApplication {
     name = "install-to-disk";
     runtimeInputs = with pkgs; [
@@ -68,7 +69,7 @@ let
       printf 'foo' > /tmp/disk.key
 
       disko-install \
-        --flake "/etc/live#target-desktop" \
+        --flake "/etc/live#target-desktop-${arch}" \
         --disk main "$DISK" \
         --no-root-passwd \
         --write-efi-boot-entries \
