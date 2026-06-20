@@ -4,6 +4,7 @@
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  system.primaryUser = "q";
   users.users.q.home = "/Users/q";
 
   programs.zsh.enable = true;

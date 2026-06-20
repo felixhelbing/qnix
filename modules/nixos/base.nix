@@ -27,6 +27,7 @@ in
     extraGroups = [ "wheel" "networkmanager" ];
     initialHashedPassword = initialPasswordHash;
   };
+  users.users.root.initialHashedPassword = initialPasswordHash;
 
   security.sudo.wheelNeedsPassword = false;
 
