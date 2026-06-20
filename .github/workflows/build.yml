@@ -39,12 +39,13 @@ jobs:
         run: nix flake check --no-build
 
       - name: Build USB image
+        id: build
         run: ./build.sh
 
       - name: Stage with timestamp
         run: |
           mkdir staged
-          SRC="$(find -L result -maxdepth 3 -type f \( -name '*.raw' -o -name '*.img' -o -name '*.iso' \) | head -1)"
+          SRC="${{ steps.build.outputs.image }}"
           EXT="${SRC##*.}"
           cp -L "$SRC" "staged/nixos-${{ matrix.arch }}-${{ steps.ts.outputs.ts }}.$EXT"
 
