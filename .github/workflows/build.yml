@@ -44,7 +44,8 @@ jobs:
       - name: Stage with timestamp
         run: |
           mkdir staged
-          cp -L result/*.raw "staged/nixos-live-${{ matrix.arch }}-${{ steps.ts.outputs.ts }}.raw"
+          SRC="$(find -L result -maxdepth 2 -type f \( -name '*.raw' -o -name '*.img' \) | head -1)"
+          cp -L "$SRC" "staged/nixos-live-${{ matrix.arch }}-${{ steps.ts.outputs.ts }}.raw"
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
