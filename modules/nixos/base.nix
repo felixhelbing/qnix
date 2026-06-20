@@ -12,7 +12,23 @@ in
 
   # systemd-initrd so the LUKS prompt has a working keymap
   boot.initrd.systemd.enable = true;
-  boot.kernelParams = [ "rd.vconsole.keymap=${keyMap}" ];
+
+  # Force USB storage modules early; rootdelay gives USB enumeration time
+  # after UEFI→kernel handoff; autosuspend off prevents stick going idle.
+  boot.initrd.kernelModules = [ "usb_storage" "uas" ];
+  boot.kernelParams = [
+    "rd.vconsole.keymap=${keyMap}"
+    "rootdelay=10"
+    "usbcore.autosuspend=-1"
+  ];
+
+  # Diagnostic tools available in initrd emergency shell
+  boot.initrd.systemd.extraBin = {
+    lsblk = "${pkgs.util-linux}/bin/lsblk";
+    dmesg = "${pkgs.util-linux}/bin/dmesg";
+    grep  = "${pkgs.gnugrep}/bin/grep";
+    lsusb = "${pkgs.usbutils}/bin/lsusb";
+  };
 
   time.timeZone = timeZone;
   i18n.defaultLocale = locale;

@@ -1,9 +1,9 @@
 {
   description = "qNixOs — Linux + macOS";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nix-darwin = {
-      url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+      url = "github:LnL7/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -11,7 +11,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-generators = {
@@ -21,7 +21,7 @@
   };
   outputs = { self, nixpkgs, nix-darwin, disko, home-manager, nixos-generators, ... }@inputs:
   let
-    nixosRelease = "25.05";
+    nixosRelease = "26.05";
     keyMap     = "us";
     timeZone   = "Europe/Berlin";
     locale     = "en_US.UTF-8";
