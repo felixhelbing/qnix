@@ -39,11 +39,15 @@ let
           target="$(realpath "$id_path" 2>/dev/null || true)"
           if [ "$target" = "$REAL" ]; then BY_ID="$id"; break; fi
         done
-        [ -z "$BY_ID" ] && continue
+        if [ -n "$BY_ID" ]; then
+          DISK_PATH="/dev/disk/by-id/$BY_ID"
+        else
+          DISK_PATH="$DEV"
+        fi
         SIZE="$(lsblk -dno SIZE "$DEV")"
         MODEL="$(lsblk -dno MODEL "$DEV" | sed 's/  */ /g')"
         SERIAL="$(lsblk -dno SERIAL "$DEV")"
-        CANDIDATES+=("$(printf '%s\t%s\t%s %s' "/dev/disk/by-id/$BY_ID" "$SIZE" "$MODEL" "$SERIAL")")
+        CANDIDATES+=("$(printf '%s\t%s\t%s %s' "$DISK_PATH" "$SIZE" "$MODEL" "$SERIAL")")
       done < <(lsblk -dno NAME,TRAN,TYPE | awk '$3=="disk" && $2!="usb" {print $1}')
       [ ''${#CANDIDATES[@]} -eq 0 ] && die "no eligible disks"
 
